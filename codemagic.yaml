@@ -2,17 +2,11 @@ workflows:
   my-workflow:
     max_build_duration: 120
     scripts:
-      - name: Set up keychain to be used for code signing using Codemagic CLI 'keychain' command
-        script: keychain initialize
-      - name: Wait for login
-        script: python3 ~/clone/wait_login.py
-      - name: Build jailbreakd
-        script: cd ~/clone/arm/iOS/jailbreakd/ && sh ./build.sh "Apple Dev"
-      - name: Get & Patch CDHash
-        script: cdhash=$(codesign -dvvv ~/clone/arm/iOS/Fugu14App/Fugu14App/jailbreakd) && python3 ~/clone/cdhash_patch.py "$cdhash"
-      - name: Build Fugu14App
-        script: cd ~/clone/arm/iOS/Fugu14App && xcodebuild -scheme Fugu14App -derivedDataPath build
-      - name: Create ipa
-        script: cd ~/clone/tools && sh ./build_ipas.sh ~/clone/arm/iOS/Fugu14App/build/Build/Products/Release-iphoneos/Fugu14App.app ~/clone/tools
+      - name: download ipsw
+        script: wget http://updates-http.cdn-apple.com/2021WinterFCS/fullrestores/071-22729/77571761-8A7F-4F67-BB19-12D9BC82405B/iPhone11,2,iPhone11,4,iPhone11,6,iPhone12,3,iPhone12,5_14.4.2_18D70_Restore.ipsw
+      - name: unzip
+        script: unzip *.ipsw
+      - name: Build
+        script: python3 -/cloneios_install.py
     artifacts:
       - tools/*.ipa
